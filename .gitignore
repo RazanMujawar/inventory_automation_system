@@ -21,3 +21,6 @@ Thumbs.db
 
 # Reports
 reports/*.csv
+
+#DB connection
+db_connection.py
