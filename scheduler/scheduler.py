@@ -1,9 +1,13 @@
 import schedule
 import time
-from main import run_pipeline
+from modules.send_email import send_reminder_email
 
-schedule.every().day.at("09:00").do(run_pipeline)
+schedule.every(1).minutes.do(
+    send_reminder_email
+)
 
 while True:
+
     schedule.run_pending()
-    time.sleep(60)
+
+    time.sleep(1)
