@@ -2,9 +2,29 @@ import schedule
 import time
 from modules.send_email import send_reminder_email
 
-schedule.every(1).minutes.do(
-    send_reminder_email
-)
+from main import run_pipeline
+
+schedule.every().monday.at(
+    "20:00"
+).do(send_reminder_email)
+
+schedule.every().tuesday.at(
+    "20:00"
+).do(send_reminder_email)
+
+schedule.every().wednesday.at(
+    "20:00"
+).do(send_reminder_email)
+
+schedule.every().thursday.at(
+    "20:00"
+).do(send_reminder_email)
+
+schedule.every().friday.at(
+    "20:00"
+).do(send_reminder_email)
+
+
 
 while True:
 

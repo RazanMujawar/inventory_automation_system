@@ -1,6 +1,10 @@
 from database.db_connection import get_connection
 from modules.send_email import send_email
+from modules.send_email import send_low_stock_summary_email
+
 def generate_alerts():
+    
+    new_alert_products = []
 
     conn = get_connection()
     cursor = conn.cursor()
@@ -29,11 +33,21 @@ def generate_alerts():
             (product_id,)
         )
 
-        existing_alert = cursor.fetchone()
+        existing_alert = cursor.fetchall()
 
         # If no open alert exists
 
-        if existing_alert is None:
+        new_alert_products.append(
+    (
+        product_id,
+        product_name,
+        stock,
+        reorder_level
+    )
+)
+        
+        
+        if len(existing_alert) == 0:
 
             insert_query = """
             INSERT INTO alerts
@@ -60,12 +74,6 @@ def generate_alerts():
                 )
             )
 
-            send_email(
-                product_name,
-                stock,
-                reorder_level
-            )
-
             print(
                 f"Alert created for {product_name}"
             )
@@ -75,7 +83,13 @@ def generate_alerts():
             print(
                 f"Open alert already exists for {product_name}"
             ) 
-        
+    
+    
+    if len(new_alert_products) > 0:
+
+        send_low_stock_summary_email(
+        new_alert_products
+    )
         
     conn.commit()
 
