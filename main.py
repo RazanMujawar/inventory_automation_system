@@ -6,6 +6,11 @@ from modules.load_to_sales_table import load_to_sales_table
 from modules.file_handler import move_to_processed
 from modules.logger import logger
 from modules.reports import generate_reports
+from modules.get_low_stock_products import get_low_stock_products
+from modules.send_email import send_summary_email
+from datetime import datetime
+from modules.email_templates import get_reminder_email
+
 
 def run_pipeline():
 
@@ -50,6 +55,20 @@ def run_pipeline():
                 move_to_processed(file_path)
                 
                 generate_reports()
+                
+                low_stock_products = (
+                    get_low_stock_products()
+                )
+
+                processing_date = datetime.now().strftime("%d-%b-%Y %I:%M %p")
+                
+                send_summary_email(
+                processing_date=processing_date,
+                processed_file=file,
+                files_processed=1,
+                sales_records=len(sales_df),
+                low_stock_products=low_stock_products
+            )
 
                 logger.info(f"{file} moved to processed folder")
 
