@@ -1,3 +1,4 @@
+from multiprocessing.dummy import connection
 import os
 from modules.load_sales import load_sales
 from modules.update_inventory import update_inventory
@@ -10,9 +11,17 @@ from modules.get_low_stock_products import get_low_stock_products
 from modules.send_email import send_summary_email
 from datetime import datetime
 from modules.email_templates import get_reminder_email
+from dotenv import load_dotenv
+load_dotenv()
+from database.db_connection import get_connection
+import streamlit as st
+from datetime import datetime
+import pandas as pd
+
 
 
 def run_pipeline():
+    connection = get_connection()
 
     files = [
         f for f in os.listdir("data")
@@ -40,12 +49,12 @@ def run_pipeline():
                 
                 
                 for _, row in sales_df.iterrows():
+                    
 
                     product_id = int(row["product_id"])
                     quantity = int(row["quantity_sold"])
-
-                    update_inventory(product_id, quantity)
-                    
+                    update_inventory(connection, product_id, quantity) 
+                
                 logger.info("Inventory updated")
 
                 generate_alerts()
@@ -81,8 +90,26 @@ def run_pipeline():
             )
 
             print(e)
-
+    connection.commit()
+    connection.close()        
+    total_products_sold = sales_df["quantity_sold"].sum()
+    
+    history = pd.DataFrame([
+    {
+        "File Name": file,
+        "Units Sold": total_products_sold,
+        "Processed At": datetime.now().strftime("%d-%b-%Y %I:%M %p")}])
     print("Pipeline completed successfully!")
 
+    
+
+    history.to_csv(
+    "history.csv",
+    mode="a",
+    header=not os.path.exists("history.csv"),
+    index=False
+)
+    
+    
 if __name__ == "__main__":
     run_pipeline()
