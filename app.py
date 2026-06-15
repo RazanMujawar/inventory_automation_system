@@ -356,15 +356,15 @@ def show_upload_sales():
                 )
 
                 st.balloons()
-    with col2:
-        st.subheader(
-                    "Uploaded Data Preview"
-                )
+        with col2:
+            st.subheader(
+                        "Uploaded Data Preview"
+                    )
 
-        st.dataframe(
-                    df,
-                    use_container_width=True
-                )
+            st.dataframe(
+                        df,
+                        use_container_width=True
+                    )
 
 
 def highlight_stock(row):
