@@ -356,12 +356,12 @@ def show_upload_sales():
                 )
 
                 st.balloons()
-        with col2:
-            st.subheader(
+    with col2:
+        st.subheader(
                     "Uploaded Data Preview"
                 )
 
-            st.dataframe(
+        st.dataframe(
                     df,
                     use_container_width=True
                 )
