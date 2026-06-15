@@ -265,7 +265,7 @@ def show_home():
 
     st.write("""
         
-    - **Database**      : Railway MySQL
+    - **Database**      : MySQL
     
     - **Analytics**     : Power BI
     
@@ -284,85 +284,87 @@ def show_upload_sales():
     st.title(
         "📤 Upload Sales"
     )
+    col1, col2 = st.columns([2,3])
 
-    uploaded_file = st.file_uploader(
-        "Upload Sales CSV",
-        type=["csv"],
-        key="sales_upload"
-    )
-
-    if uploaded_file:
-
-        df = pd.read_csv(
-            uploaded_file
+    with col1:
+        uploaded_file = st.file_uploader(
+            "Upload Sales CSV",
+            type=["csv"],
+            key="sales_upload"
         )
 
-        st.success(
-            f"{uploaded_file.name} uploaded successfully!"
-        )
+        if uploaded_file:
 
-        errors = validate_uploaded_file(
-            df
-        )
-
-        invalid_ids = validate_product_ids(
-            df
-        )
-
-        for pid in invalid_ids:
-
-            errors.append(
-                f"Product ID {pid} not found"
+            df = pd.read_csv(
+                uploaded_file
             )
-
-        if len(errors) == 0:
 
             st.success(
-                "Validation Passed!"
+                f"{uploaded_file.name} uploaded successfully!"
             )
 
-            if st.button(
-                "🚀 Run Inventory Processing"
-            ):
+            errors = validate_uploaded_file(
+                df
+            )
 
-                save_uploaded_file(
-                    uploaded_file
+            invalid_ids = validate_product_ids(
+                df
+            )
+
+            for pid in invalid_ids:
+
+                errors.append(
+                    f"Product ID {pid} not found"
                 )
 
-                with st.spinner(
-                    "Processing inventory..."
+            if len(errors) == 0:
+
+                st.success(
+                    "Validation Passed!"
+                )
+
+                if st.button(
+                    "🚀 Run Inventory Processing"
                 ):
 
-                    run_pipeline()
-                    st.cache_data.clear()
-                st.session_state.processed = True
+                    save_uploaded_file(
+                        uploaded_file
+                    )
 
-        else:
+                    with st.spinner(
+                        "Processing inventory..."
+                    ):
 
-            st.error(
-                "Validation Failed!"
-            )
+                        run_pipeline()
+                        st.cache_data.clear()
+                    st.session_state.processed = True
 
-            for error in errors:
+            else:
 
-                st.error(error)
+                st.error(
+                    "Validation Failed!"
+                )
 
-        if st.session_state.processed:
+                for error in errors:
 
-            st.success(
-                "Inventory processing completed!"
-            )
+                    st.error(error)
 
-            st.balloons()
+            if st.session_state.processed:
 
-        st.subheader(
-            "Uploaded Data Preview"
-        )
+                st.success(
+                    "Inventory processing completed!"
+                )
 
-        st.dataframe(
-            df,
-            use_container_width=True
-        )
+                st.balloons()
+        with col2:
+            st.subheader(
+                    "Uploaded Data Preview"
+                )
+
+            st.dataframe(
+                    df,
+                    use_container_width=True
+                )
 
 
 def highlight_stock(row):
@@ -676,9 +678,10 @@ with left_col:
     st.info(
         f"""
         📊 Next Power BI Refresh
+        
         ⏱ {hours}h {minutes}m
-        Refresh Scheduled
-        9AM • 12PM • 3PM • 6PM • 9PM"""
+        
+        9AM  •  12PM  •  3PM  •  6PM  •  9PM"""
     )
         
 with right_col:
