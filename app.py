@@ -571,8 +571,7 @@ def show_history():
     col1, col2 = st.columns(2)
 
     with col1:
-        today = datetime.now().strftime("%d-%b-%Y")
-
+        today = datetime.now(ZoneInfo("Asia/Kolkata")).strftime("%d-%b-%Y %I:%M %p")
         today_files = history_df[history_df["Processed At"].str.contains(today)]
         
         st.metric("Today's Files Processed",len(today_files))
