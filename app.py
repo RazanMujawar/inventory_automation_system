@@ -287,8 +287,8 @@ def show_upload_sales():
     col1, col2 = st.columns([2,3])
 
     with col1:
+        st.subheader ("Upload Sales CSV")
         uploaded_file = st.file_uploader(
-            "Upload Sales CSV",
             type=["csv"],
             key="sales_upload"
         )
@@ -316,6 +316,15 @@ def show_upload_sales():
                 errors.append(
                     f"Product ID {pid} not found"
                 )
+            with col2:
+                st.subheader(
+                        "Uploaded Data Preview"
+                    )
+
+                st.dataframe(
+                        df,
+                        use_container_width=True
+                    )
 
             if len(errors) == 0:
 
@@ -338,6 +347,8 @@ def show_upload_sales():
                         run_pipeline()
                         st.cache_data.clear()
                     st.session_state.processed = True
+                    
+                    
 
             else:
 
@@ -356,15 +367,7 @@ def show_upload_sales():
                 )
 
                 st.balloons()
-        with col2:
-            st.subheader(
-                        "Uploaded Data Preview"
-                    )
-
-            st.dataframe(
-                        df,
-                        use_container_width=True
-                    )
+        
 
 
 def highlight_stock(row):
