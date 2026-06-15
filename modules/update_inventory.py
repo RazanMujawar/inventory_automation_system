@@ -1,14 +1,14 @@
 import logging
-from database.db_connection import get_connection
 
 logger = logging.getLogger(__name__)
 
-def update_inventory(product_id, quantity):
+def update_inventory(
+    connection,
+    product_id,
+    quantity
+):
 
-    connection = get_connection()
     cursor = connection.cursor()
-
-    # Get current stock
 
     cursor.execute(
         """
@@ -21,19 +21,18 @@ def update_inventory(product_id, quantity):
 
     result = cursor.fetchone()
 
-    current_stock = result[0]
-
-    # Prevent negative stock
+    current_stock = result[0] if result else 0
 
     new_stock = max(
         0,
         current_stock - quantity
     )
+
     if quantity > current_stock:
+
         logger.warning(
             f"Insufficient stock for Product {product_id}"
         )
-    # Update inventory
 
     cursor.execute(
         """
@@ -47,12 +46,9 @@ def update_inventory(product_id, quantity):
         )
     )
 
-    connection.commit()
-
     print(
         f"Product {product_id}: "
         f"{current_stock} -> {new_stock}"
     )
 
     cursor.close()
-    connection.close()
