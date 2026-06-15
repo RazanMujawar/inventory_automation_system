@@ -579,7 +579,7 @@ def show_history():
 
     with col2:
         st.metric("Today's Units Sold",history_df["Units Sold"].sum())
-   
+    st.cache_data.clear()
 def get_next_refresh():
 
     now = datetime.now()
