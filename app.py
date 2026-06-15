@@ -8,6 +8,7 @@ from main import run_pipeline
 from reports.reports import get_report_data
 from dotenv import load_dotenv
 load_dotenv()
+from zoneinfo import ZoneInfo
 
 st.set_page_config(
     page_title="Lumina & Co.",
@@ -293,38 +294,39 @@ def show_upload_sales():
             key="sales_upload"
         )
 
-    if uploaded_file:
-
-        df = pd.read_csv(
-                uploaded_file
-            )
-
-        st.success(
-                f"{uploaded_file.name} uploaded successfully!"
-            )
-
-        errors = validate_uploaded_file(
-                df
-            )
-
-        invalid_ids = validate_product_ids(
-                df
-            )
-
-        for pid in invalid_ids:
-
-                errors.append(
-                    f"Product ID {pid} not found"
-                )
     with col2:
-                st.subheader(
-                        "Uploaded Data Preview"
-                    )
+        if uploaded_file:
 
-                st.dataframe(
-                        df,
-                        use_container_width=True
+            df = pd.read_csv(
+                    uploaded_file
+                )
+
+            st.success(
+                    f"{uploaded_file.name} uploaded successfully!"
+                )
+
+            errors = validate_uploaded_file(
+                    df
+                )
+
+            invalid_ids = validate_product_ids(
+                    df
+                )
+
+            for pid in invalid_ids:
+
+                    errors.append(
+                        f"Product ID {pid} not found"
                     )
+        
+            st.subheader(
+                            "Uploaded Data Preview"
+                        )
+
+            st.dataframe(
+                            df,
+                            use_container_width=True
+                        )
 
     if len(errors) == 0:
 
@@ -574,14 +576,16 @@ def show_history():
     col1, col2 = st.columns(2)
 
     with col1:
-        today = datetime.now(ZoneInfo("Asia/Kolkata")).strftime("%d-%b-%Y %I:%M %p")
-        today_files = history_df[history_df["Processed At"].str.contains(today)]
+        today = datetime.now(ZoneInfo("Asia/Kolkata")).strftime("%d-%b-%Y")
+        today = datetime.now(ZoneInfo("Asia/Kolkata")).strftime("%d-%b-%Y")
         
         st.metric("Today's Files Processed",len(today_files))
 
     with col2:
         st.metric("Today's Units Sold",history_df["Units Sold"].sum())
-    st.cache_data.clear()
+
+
+
 def get_next_refresh():
 
     now = datetime.now()
