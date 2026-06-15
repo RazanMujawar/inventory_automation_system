@@ -293,30 +293,30 @@ def show_upload_sales():
             key="sales_upload"
         )
 
-        if uploaded_file:
+    if uploaded_file:
 
-            df = pd.read_csv(
+        df = pd.read_csv(
                 uploaded_file
             )
 
-            st.success(
+        st.success(
                 f"{uploaded_file.name} uploaded successfully!"
             )
 
-            errors = validate_uploaded_file(
+        errors = validate_uploaded_file(
                 df
             )
 
-            invalid_ids = validate_product_ids(
+        invalid_ids = validate_product_ids(
                 df
             )
 
-            for pid in invalid_ids:
+        for pid in invalid_ids:
 
                 errors.append(
                     f"Product ID {pid} not found"
                 )
-            with col2:
+    with col2:
                 st.subheader(
                         "Uploaded Data Preview"
                     )
@@ -326,13 +326,13 @@ def show_upload_sales():
                         use_container_width=True
                     )
 
-            if len(errors) == 0:
+    if len(errors) == 0:
 
-                st.success(
+        st.success(
                     "Validation Passed!"
                 )
 
-                if st.button(
+        if st.button(
                     "🚀 Run Inventory Processing"
                 ):
 
@@ -350,7 +350,7 @@ def show_upload_sales():
                     
                     
 
-            else:
+        else:
 
                 st.error(
                     "Validation Failed!"
@@ -360,7 +360,7 @@ def show_upload_sales():
 
                     st.error(error)
 
-            if st.session_state.processed:
+        if st.session_state.processed:
 
                 st.success(
                     "Inventory processing completed!"
