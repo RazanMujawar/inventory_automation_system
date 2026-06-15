@@ -168,7 +168,7 @@ def send_low_stock_summary_email(
 ):
 
     sender = "razanmujawar2211@gmail.com"
-    receiver = "itzrohitpatil08@gmail.com"
+    receiver = "rizwanamujawar2211@gmail.com"
 
     rows = ""
 
