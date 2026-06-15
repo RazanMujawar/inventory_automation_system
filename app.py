@@ -1,9 +1,13 @@
+import webbrowser
 import streamlit as st
 import pandas as pd
 import os
-
+from datetime import datetime, timedelta
 from database.db_connection import get_connection
 from main import run_pipeline
+from reports.reports import get_report_data
+from dotenv import load_dotenv
+load_dotenv()
 
 st.set_page_config(
     page_title="Lumina & Co.",
@@ -13,8 +17,11 @@ st.set_page_config(
 
 if "page" not in st.session_state:
     st.session_state.page = "Home"
-    
+ 
+ 
+@st.cache_data(ttl=60)    
 def get_inventory():
+    
 
     conn = get_connection()
 
@@ -37,6 +44,7 @@ def get_inventory():
     conn.close()
 
     return data
+
 
 def restock_inventory(
     product_name,
@@ -178,11 +186,13 @@ def validate_product_ids(df):
     return invalid_ids   
     
 def show_home():
-    st.image(
-        "images/logo.png",
-        use_container_width=True
-    )
+    col1, col2, col3 = st.columns([1,3,1])
 
+    with col2:
+        st.image(
+        "images/logo.png",
+        width=550
+    )
     st.subheader("About Us")
 
     st.write("""
@@ -193,71 +203,78 @@ def show_home():
     and reporting.
     """)
 
-    st.image(
-        "images/hero.png",
-        use_container_width=True
-    )
+    col1, col2, col3 = st.columns([1,3,1])
 
+    with col2:
+        st.image(
+        "images/hero.png",
+        width=800
+    )
     st.markdown("---")
 
-st.subheader(
-    "🚀 Platform Features"
-)
-
-col1, col2 = st.columns(2)
-
-with col1:
-
-    st.info(
-        """
-        📤 **Sales Upload**
-
-        Upload and validate
-        daily sales files.
-        """
+    st.subheader(
+        "🚀 Platform Features" 
     )
 
-    st.info(
-        """
-        📦 **Inventory Management**
+    st.markdown("""
 
-        Monitor stock levels
-        in real time.
-        """
-    )
 
-with col2:
+    **1. 📤 Sales Upload**
 
-    st.info(
-        """
-        ⚠ **Automated Alerts**
+    &nbsp;&nbsp;&nbsp;&nbsp; - Upload and validate daily sales files.
 
-        Receive low stock
-        email notifications.
-        """
-    )
+    <br>
 
-    st.info(
-        """
-        📊 **Reporting**
+    **2. 📦 Inventory Management**
 
-        Generate inventory
-        and sales reports.
-        """
-    )
+    &nbsp;&nbsp;&nbsp;&nbsp; - Monitor stock levels in real time.
+
+    <br>
+
+    **3. ⚠ Automated Alerts**
+
+    &nbsp;&nbsp;&nbsp;&nbsp; - Receive low stock notifications.
+
+    <br>
+
+    **4. 📊 Power BI Dashboard**
+
+    &nbsp;&nbsp;&nbsp;&nbsp; - Visualize inventory and sales analytics.
+    """, unsafe_allow_html=True)
     
-    st.subheader("Contact Us")
+    st.markdown("---")
+
+    st.subheader("🔄 How It Works")
+    st.markdown("""
+
+        1. Upload 
+        
+        2. Validate
+
+        3. Update
+
+        4. Alerts
+        
+        5. Reports
+        """)
+
+    
+    st.markdown("---")
+    
+    st.subheader("System Information")
 
     st.write("""
-    📍 Pune, Maharashtra, India
-
-    📧 inventory@luminaandco.com
-
-    📞 +91-9665069762
-    """)
+        
+    - **Database**      : Railway MySQL
     
-
-
+    - **Analytics**     : Power BI
+    
+    - **Alerts**        : Email Notifications
+    
+    - **Deployment**    : Streamlit
+    
+    - **Refresh Times** : 9AM | 12PM | 3PM | 6PM | 9PM
+        """)
 def show_upload_sales():
 
     if "processed" not in st.session_state:
@@ -317,7 +334,7 @@ def show_upload_sales():
                 ):
 
                     run_pipeline()
-
+                    st.cache_data.clear()
                 st.session_state.processed = True
 
         else:
@@ -347,7 +364,28 @@ def show_upload_sales():
             use_container_width=True
         )
 
+
+def highlight_stock(row):
+
+    stock = row["Current Stock"]
+    reorder = row["Reorder Level"]
     
+    if stock < reorder:
+        return [
+    "background-color:#f8d7da; color:#111111"
+] * len(row)
+
+    elif stock <= reorder + 5:
+        return [
+    "background-color:#fff3cd; color:#111111"
+] * len(row)
+
+    else:
+        return [
+    "background-color:#d1e7dd; color:#111111"
+] * len(row)
+        
+        
 def show_inventory():
 
     st.title(
@@ -356,6 +394,12 @@ def show_inventory():
 
     inventory = get_inventory()
 
+    st.caption("""
+    🟢 Healthy Stock
+    🟡 Near Reorder Level
+    🔴 Below Reorder Level
+    """)
+    
     inventory_df = pd.DataFrame(
         inventory,
         columns=[
@@ -366,11 +410,23 @@ def show_inventory():
         ]
     )
 
-    st.dataframe(
-        inventory_df,
-        use_container_width=True
-    )
+    styled_df = inventory_df.style.apply(
+    highlight_stock,
+    axis=1
+)
 
+    st.dataframe(styled_df,use_container_width=True)
+    low_stock_items = inventory_df[inventory_df["Current Stock"]<=inventory_df["Reorder Level"]]
+
+    if not low_stock_items.empty:
+
+        products = ", ".join(
+            low_stock_items["Product Name"]
+        )
+
+        st.warning(
+            f"⚠ Low Stock Products: {products}"
+        )
 def show_restock():
 
     st.title(
@@ -412,7 +468,149 @@ def show_restock():
         st.success(
             f"{selected_product} restocked successfully!"
         )
+
+def show_reports():
+
+    st.title(
+        "📑 Reports"
+    )
+
+    (
+        total_products,
+        total_stock,
+        low_stock,
+        open_alerts
+    ) = get_report_data()
     
+    col1, col2 = st.columns(2)
+
+    with col1:
+        st.metric(
+            "📦 Total Products",
+            total_products
+        )
+
+    with col2:
+        st.metric(
+            "📈 Total Stock",
+            total_stock
+        )
+
+    col3, col4 = st.columns(2)
+
+    with col3:
+        st.metric(
+            "⚠ Low Stock Items",
+            low_stock
+        )
+
+    with col4:
+        st.metric(
+            "🚨 Open Alerts",
+            open_alerts
+        )
+        
+    inventory = get_inventory()
+
+    inventory_df = pd.DataFrame(
+        inventory,
+        columns=[
+            "Product ID",
+            "Product Name",
+            "Current Stock",
+            "Reorder Level"
+        ]
+    )
+
+    styled_df = inventory_df.style.apply(
+    highlight_stock,
+    axis=1
+)    
+    st.subheader(" 🚨 Product that need to be Reordered")
+    low_stock_items = inventory_df[inventory_df["Current Stock"]<=inventory_df["Reorder Level"]]
+
+    st.dataframe(
+    low_stock_items[
+        [
+            "Product Name",
+            "Current Stock",
+            "Reorder Level"
+        ]
+    ]
+)
+    
+    st.markdown("---")
+
+def show_history():
+
+    st.title("📜 Processing History")
+
+    if not os.path.exists("history.csv"):
+        st.info("No processing history available.")
+        return
+
+    try:
+
+        history_df = pd.read_csv(
+            "history.csv"
+        )
+
+        st.dataframe(
+            history_df,
+            hide_index=True,
+            use_container_width=True
+        )
+
+    except Exception:
+
+        st.warning(
+            "No history records found."
+        )
+    col1, col2 = st.columns(2)
+
+    with col1:
+        today = datetime.now().strftime("%d-%b-%Y")
+
+        today_files = history_df[history_df["Processed At"].str.contains(today)]
+        
+        st.metric("Today's Files Processed",len(today_files))
+
+    with col2:
+        st.metric("Today's Units Sold",history_df["Units Sold"].sum())
+   
+def get_next_refresh():
+
+    now = datetime.now()
+
+    refresh_hours = [
+        9,
+        12,
+        15,
+        18,
+        21
+    ]
+
+    for hour in refresh_hours:
+
+        refresh_time = now.replace(
+            hour=hour,
+            minute=0,
+            second=0,
+            microsecond=0
+        )
+
+        if refresh_time > now:
+
+            return refresh_time
+
+    return (
+        now + timedelta(days=1)
+    ).replace(
+        hour=9,
+        minute=0,
+        second=0,
+        microsecond=0
+    )
 
 left_col, divider_col, right_col = st.columns(
     [1.2, 0.05, 4]
@@ -433,8 +631,8 @@ with divider_col:
 with left_col:
 
     st.image(
-        "images/logo.png",
-        use_container_width=True
+        "images/logo without sub.png",
+        width=180
     )
 
     st.markdown("---")
@@ -451,6 +649,38 @@ with left_col:
     if st.button("📦 Restock Inventory"):
         st.session_state.page = "Restock"
         
+    if st.button("📑 Reports"):
+        st.session_state.page = "Reports"
+    
+    st.link_button(
+        "📊 Open Power BI Dashboard",
+        "https://app.powerbi.com/groups/me/reports/6c7f3f8d-5c2b-4b40-abcc-db38c78c58d7/412b639c0503d8882a82?experience=power-bi"
+    )
+
+    if st.button("📜 History"):
+        st.session_state.page = "History"
+
+    next_refresh = get_next_refresh()
+
+    remaining = (
+        next_refresh -
+        datetime.now()
+    )
+
+    hours = remaining.seconds // 3600
+
+    minutes = (
+        remaining.seconds % 3600
+    ) // 60
+
+    st.info(
+        f"""
+        📊 Next Power BI Refresh
+        ⏱ {hours}h {minutes}m
+        Refresh Scheduled
+        9AM • 12PM • 3PM • 6PM • 9PM"""
+    )
+        
 with right_col:
 
     if st.session_state.page == "Home":
@@ -464,3 +694,11 @@ with right_col:
 
     elif st.session_state.page == "Restock":
         show_restock()
+        
+    elif st.session_state.page == "Reports":
+        show_reports()
+        
+    elif st.session_state.page == "Power BI Dashboard":
+        show_reports()
+    elif st.session_state.page == "History":
+        show_history()
