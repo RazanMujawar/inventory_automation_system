@@ -88,11 +88,11 @@ def run_pipeline():
             logger.error(
                 f"Error processing {file}: {str(e)}"
             )
-
-            print(e)
+    total_products_sold = sales_df["quantity_sold"].sum()
+    print(e)
     connection.commit()
     connection.close()        
-    total_products_sold = sales_df["quantity_sold"].sum()
+    
     
     history = pd.DataFrame([
     {
