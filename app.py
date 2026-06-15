@@ -458,14 +458,14 @@ def show_restock():
         step=1
     )
 
-    if st.button(
-        "Update Inventory"
-    ):
+    if st.button("Update Inventory"):
 
         restock_inventory(
             selected_product,
             restock_quantity
         )
+
+        st.cache_data.clear()
 
         st.success(
             f"{selected_product} restocked successfully!"
