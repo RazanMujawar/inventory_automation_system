@@ -298,8 +298,22 @@ def show_upload_sales():
             key="sales_upload"
         )
         if uploaded_file:
+            try:
+                df = pd.read_csv(uploaded_file)
 
-            df = pd.read_csv(uploaded_file)
+            except Exception:
+
+                st.error(
+        """
+        ❌ Invalid File
+
+        Unable to read the uploaded file.
+
+        Please upload a valid CSV file.
+        """
+)
+
+                return
 
             st.success(
                 f"{uploaded_file.name} uploaded successfully!"
@@ -307,12 +321,14 @@ def show_upload_sales():
 
             errors = validate_uploaded_file(df)
 
-            invalid_ids = validate_product_ids(df)
+            if "product_id" in df.columns:
 
-            for pid in invalid_ids:
-                errors.append(
-                    f"Product ID {pid} not found"
-                )
+                invalid_ids = validate_product_ids(df)
+
+                for pid in invalid_ids:
+                    errors.append(
+                        f"Product ID {pid} not found"
+                    )
 
             if len(errors) == 0:
 
@@ -338,7 +354,17 @@ def show_upload_sales():
 
             else:
 
-                st.error("Validation Failed!")
+                st.error(
+                    """
+                    ❌ No Relevant Sales Data Found
+
+                    Required columns:
+                    • product_id
+                    • quantity_sold
+
+                    Please upload a valid sales file.
+                    """
+                )
 
                 for error in errors:
                     st.error(error)
