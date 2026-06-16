@@ -283,7 +283,9 @@ def show_upload_sales():
         st.session_state.processed = False
 
     st.title("📤 Upload Sales")
+    if "last_run" in st.session_state:
 
+        st.info(f"✅ Last inventory processing completed at {st.session_state['last_run']}")
     col1, col2 = st.columns([2,3])
 
     with col1:
@@ -320,34 +322,18 @@ def show_upload_sales():
 
                 if st.button("🚀 Run Inventory Processing"):
 
-                    try:
+                    save_uploaded_file(uploaded_file)
 
-                        st.write("STEP 1")
+                    with st.spinner("Processing inventory..."):
+                        run_pipeline()
 
-                        save_uploaded_file(uploaded_file)
-
-                        st.write("STEP 2")
-
-                        with st.spinner("Processing inventory..."):
-                            run_pipeline()
-
-                        st.write("STEP 3")
-
-                        st.session_state.processed = True
-
-                        st.success(
-                            "✅ Inventory processing completed successfully!"
-                        )
-
-                    except Exception as e:
-
-                        st.error(
-                            f"ERROR FOUND: {str(e)}"
-                        )
+                    st.session_state["last_run"] = datetime.now().strftime(
+                        "%d-%b-%Y %I:%M %p"
+                    )
 
                                     
 
-                    else:
+                else:
 
                         st.error("Validation Failed!")
 
