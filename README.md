@@ -126,31 +126,31 @@ Power BI Dashboard
 
 ### Home Page
 
-![alt text](image-2.png)
+![Descriptive alt text](assests/home.png)
 
 ### Upload Sales
 
-![alt text](image-3.png)
+![Descriptive alt text](assests/upload_sales.png)
 
 ### Inventory Dashboard
 
-![alt text](image-4.png)
+![Descriptive alt text](assests/inventory.png)
 
 ### Restock Inventory
 
-![alt text](image-5.png)
+![Descriptive alt text](assests/restock.png)
 
 ### Reports
 
-![alt text](image-6.png)
+![Descriptive alt text](assests/reports.png)
 
 ### Processing History
 
-![alt text](image-7.png)
+![Descriptive alt text](assests/history.png)
 
 ### Power BI Dashboard
 
-![alt text](image-8.png)
+![Descriptive alt text](assests/PowerBi_dash.png)
 
 ---
 
