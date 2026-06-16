@@ -321,23 +321,21 @@ def show_upload_sales():
                     "🚀 Run Inventory Processing"
                 ):
 
-                    save_uploaded_file(
-                        uploaded_file
-                    )
+                    save_uploaded_file(uploaded_file)
 
-                    with st.spinner(
-                        "Processing inventory..."
-                    ):
+                    with st.spinner("Processing inventory..."):
 
                         run_pipeline()
-                        st.success(
-                        "Inventory processing completed!"
-                    )
-                        st.balloons()
 
                     st.cache_data.clear()
 
                     st.session_state.processed = True
+                    
+                    if st.session_state.processed:
+
+                        st.success("✅ Inventory processing completed successfully!" )
+
+                        st.balloons()
 
                     
 
