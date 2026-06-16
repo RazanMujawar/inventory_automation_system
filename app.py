@@ -276,6 +276,7 @@ def show_home():
     
     - **Refresh Times** : 9AM | 12PM | 3PM | 6PM | 9PM
         """)
+    
 def show_upload_sales():
 
     if "processed" not in st.session_state:
@@ -317,30 +318,25 @@ def show_upload_sales():
                     "Validation Passed!"
                 )
 
-                if st.button("🚀 Run Inventory Processing"):
-
-                    st.write("STEP 1")
+                if st.button(
+                    "🚀 Run Inventory Processing"
+                ):
 
                     save_uploaded_file(uploaded_file)
 
-                    st.write("STEP 2")
+                    with st.spinner("Processing inventory..."):
 
-                    try:
+                        run_pipeline()
 
-                        with st.spinner(
-                            "Processing inventory..."
-                        ):
-                            run_pipeline()
+                    st.cache_data.clear()
 
-                        st.write("STEP 3")
+                    st.session_state.processed = True
+                    
+                if st.session_state.processed:
 
-                    except Exception as e:
+                    st.success("✅ Inventory processing completed successfully!" )
 
-                        st.error(
-                            f"ERROR: {e}"
-                        )
-
-                        st.write("STEP ERROR")
+                    st.balloons()
 
                     
 
