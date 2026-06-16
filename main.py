@@ -89,10 +89,10 @@ def run_pipeline():
                 connection.close()        
                 
                 
-                history = pd.DataFrame
-                "File Name": file
-                "Units Sold": total_products_sold
-                "Processed At":datetime.now(ZoneInfo("Asia/Kolkata")).strftime("%d-%b-%Y %I:%M %p")
+                history = pd.DataFrame([{
+                "File Name": file,
+                "Units Sold": total_products_sold,
+                "Processed At": datetime.now(ZoneInfo("Asia/Kolkata")).strftime("%d-%b-%Y %I:%M %p")}])
                 print("Pipeline completed successfully!")
                 
                 history.to_csv(
