@@ -330,19 +330,6 @@ def show_upload_sales():
                     st.cache_data.clear()
 
                     st.session_state.processed = True
-                    
-                if st.session_state.processed:
-                    st.write(
-    "Processed State:",
-    st.session_state.processed
-)
-
-                    st.success("✅ Inventory processing completed successfully!" )
-
-                    st.balloons()
-
-                    
-
             else:
 
                 st.error(
@@ -351,6 +338,14 @@ def show_upload_sales():
 
                 for error in errors:
                     st.error(error)
+                    
+                    
+        if st.session_state.processed:
+                    st.write("Processed State:",st.session_state.processed)
+
+                    st.success("✅ Inventory processing completed successfully!" )
+
+                    st.balloons()
 
     with col2:
         st.subheader("Uploaded Data Preview")
