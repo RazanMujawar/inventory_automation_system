@@ -328,6 +328,9 @@ def show_upload_sales():
                         run_pipeline()
 
                     st.cache_data.clear()
+
+                    st.session_state.processed = True
+                    
                     st.toast("Inventory processing completed successfully!",icon="✅")
 
                     
