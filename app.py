@@ -288,8 +288,9 @@ def show_upload_sales():
     col1, col2 = st.columns([2,3])
 
     with col1:
-        st.subheader ("Upload Sales CSV")
+        st.subheader ("Upload Today's Sales")
         uploaded_file = st.file_uploader(
+            "Choose Sales CSV File",
             type=["csv"],
             key="sales_upload"
         )
@@ -573,18 +574,22 @@ def show_history():
         st.warning(
             "No history records found."
         )
+        return
+    
     col1, col2 = st.columns(2)
 
     with col1:
+
         today = datetime.now(ZoneInfo("Asia/Kolkata")).strftime("%d-%b-%Y")
-        today = datetime.now(ZoneInfo("Asia/Kolkata")).strftime("%d-%b-%Y")
-        
-        st.metric("Today's Files Processed",len(today_files))
+
+        today_files = history_df[history_df["Processed At"].str.contains(today)]
+
+    st.metric("Today's Files Processed",len(today_files))
 
     with col2:
         st.metric("Today's Units Sold",history_df["Units Sold"].sum())
 
-
+    
 
 def get_next_refresh():
 
