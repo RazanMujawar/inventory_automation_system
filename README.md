@@ -126,31 +126,31 @@ Power BI Dashboard
 
 ### Home Page
 
-(Add Screenshot)
+![alt text](image-2.png)
 
 ### Upload Sales
 
-(Add Screenshot)
+![alt text](image-3.png)
 
 ### Inventory Dashboard
 
-(Add Screenshot)
+![alt text](image-4.png)
 
 ### Restock Inventory
 
-(Add Screenshot)
+![alt text](image-5.png)
 
 ### Reports
 
-(Add Screenshot)
+![alt text](image-6.png)
 
 ### Processing History
 
-(Add Screenshot)
+![alt text](image-7.png)
 
 ### Power BI Dashboard
 
-(Add Screenshot)
+![alt text](image-8.png)
 
 ---
 
