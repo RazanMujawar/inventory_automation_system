@@ -321,15 +321,18 @@ def show_upload_sales():
                 )
 
                 if st.button("🚀 Run Inventory Processing"):
-
                     save_uploaded_file(uploaded_file)
-
+                    
+                    status_box = st.empty()  # reserve a spot on screen
+                    
                     with st.spinner("Processing inventory..."):
                         run_pipeline()
-
-                    st.session_state["last_run"] = datetime.now().strftime(
-                        "%d-%b-%Y %I:%M %p"
-                    )
+                    
+                    st.cache_data.clear()
+                    
+                    status_box.success("✅ Inventory processing completed successfully!")
+                    st.balloons()
+                    st.stop()  # ← stops Streamlit from rerunning further
 
                                     
 
@@ -343,7 +346,7 @@ def show_upload_sales():
     with col2:
         st.subheader("Uploaded Data Preview")
         if uploaded_file:
-            st.dataframe(df,use_container_width=True, hide_index = True)
+            st.dataframe(df,width="Stretch", hide_index = True)
         
 
 
@@ -397,7 +400,7 @@ def show_inventory():
     axis=1
 )
 
-    st.dataframe(styled_df,use_container_width=True)
+    st.dataframe(styled_df,width="stretch")
     low_stock_items = inventory_df[inventory_df["Current Stock"]<=inventory_df["Reorder Level"]]
 
     if not low_stock_items.empty:
@@ -540,7 +543,7 @@ def show_history():
         st.dataframe(
             history_df,
             hide_index=True,
-            use_container_width=True
+            width="strecth"
         )
 
     except Exception:
