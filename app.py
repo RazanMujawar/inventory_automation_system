@@ -331,11 +331,11 @@ def show_upload_sales():
 
                     st.session_state.processed = True
                     
-                if st.session_state.processed:
+            if st.session_state.processed:
 
-                    st.success("✅ Inventory processing completed successfully!" )
+                st.success("✅ Inventory processing completed successfully!" )
 
-                    st.balloons()
+                st.balloons()
 
                     
 
