@@ -1,61 +1,35 @@
-# Lumina & Co. - Inventory Automation Platform
+# 📦 Lumina Inventory Automation System
 
-## Overview
+A cloud-based Inventory Management and Automation System built using Python, Streamlit, MySQL, and Power BI.
 
-Lumina & Co. is an Inventory Automation Platform developed to automate inventory tracking, sales processing, low-stock monitoring, alert generation, and reporting.
-
-The platform enables businesses to upload daily sales files, automatically update inventory levels, generate low-stock alerts, send email notifications, and create operational reports.
+The system automates inventory updates from daily sales files, tracks stock levels in real-time, generates low-stock alerts, sends email notifications, and provides interactive reporting through Power BI dashboards.
 
 ---
 
-## Features
+## 🚀 Live Application
 
-### Upload Sales
-
-* Upload daily sales CSV files
-* Validate file structure and data quality
-* Verify product IDs against inventory database
-* Prevent invalid records from entering the system
-
-### Inventory Processing
-
-* Load sales records into MySQL
-* Update product stock levels automatically
-* Maintain inventory accuracy
-
-### Low Stock Alerts
-
-* Detect products below reorder level
-* Generate alert records
-* Send automated email notifications
-
-### Reporting
-
-* Inventory Report
-* Sales Summary Report
-* Low Stock Report
-
-### Reminder Emails
-
-* Scheduled reminder emails for sales file submission
-* HTML email templates
-
-### Inventory Management
-
-* View current inventory
-* Restock products directly from UI
-* Update inventory database instantly
-
-### Streamlit Dashboard
-
-* Home Page
-* Upload Sales
-* Show Inventory
-* Restock Inventory
+Streamlit App:
+https://lumina-inventory-automation.streamlit.app
 
 ---
 
-## Tech Stack
+## 📌 Project Overview
+
+Managing inventory manually can lead to stock shortages, inaccurate records, and delayed reporting.
+
+This project automates the complete inventory workflow by:
+
+* Uploading daily sales files
+* Updating inventory automatically
+* Generating low-stock alerts
+* Sending email notifications
+* Tracking processing history
+* Visualizing inventory data in Power BI
+* Managing inventory through a cloud-hosted web application
+
+---
+
+## 🛠️ Tech Stack
 
 ### Frontend
 
@@ -67,97 +41,179 @@ The platform enables businesses to upload daily sales files, automatically updat
 
 ### Database
 
-* MySQL
+* MySQL (Aiven Cloud)
 
-### Libraries
+### Analytics
 
-* Pandas
-* Streamlit
-* MySQL Connector
-* Schedule
-* SMTP Email Services
+* Power BI
 
----
+### Automation
 
-## Project Structure
+* Python ETL Pipeline
+* Email Notifications (SMTP)
 
-inventory_automation_system/
+### Deployment
 
-├── app.py
-
-├── database/
-
-│ └── db_connection.py
-
-├── modules/
-
-│ ├── generate_alerts.py
-
-│ ├── load_sales.py
-
-│ ├── load_to_sales_table.py
-
-│ ├── update_inventory.py
-
-│ ├── reports.py
-
-│ ├── send_email.py
-
-│ ├── file_handler.py
-
-│ └── logger.py
-
-├── pages/
-
-│ ├── upload_sales.py
-
-│ ├── show_inventory.py
-
-│ └── restock_inventory.py
-
-├── scheduler/
-
-│ └── scheduler.py
-
-├── data/
-
-├── processed/
-
-├── logs/
-
-└── images/
+* Streamlit Community Cloud
+* Aiven Cloud Database
 
 ---
 
-## Workflow
+## ✨ Key Features
 
-1. Upload Sales CSV
-2. Validate File
-3. Load Sales Data
-4. Update Inventory
-5. Generate Alerts
-6. Send Email Notifications
-7. Generate Reports
-8. Move File to Processed Folder
+### 📤 Sales Upload & Validation
+
+* Upload daily sales CSV files
+* Automatic validation of file structure
+* Product ID verification
+* User-friendly error handling
+
+### 🔄 Automated Inventory Processing
+
+* Updates stock quantities automatically
+* Maintains inventory accuracy
+* Processes sales records in real time
+
+### ⚠️ Low Stock Alert System
+
+* Detects products below reorder levels
+* Generates inventory alerts
+* Sends automated email notifications
+
+### 📦 Inventory Management
+
+* View current inventory levels
+* Color-coded stock status
+* Search and monitor products
+
+### ➕ Restock Management
+
+* Update inventory quantities
+* Instantly refresh stock levels
+
+### 📊 Reporting Dashboard
+
+* Inventory analytics
+* Sales summaries
+* Low stock monitoring
+* Power BI integration
+
+### 🕒 Processing History
+
+* Tracks processed files
+* Records units sold
+* Stores processing timestamps
 
 ---
 
-## Future Enhancements
+## 🏗️ System Architecture
 
-* Power BI Dashboard Integration
-* User Authentication
-* Role Based Access Control
-* Product Management
-* Supplier Management
-* Purchase Order Automation
-* AI Powered Inventory Forecasting
+Daily Sales CSV
+↓
+Streamlit Application
+↓
+Python ETL Pipeline
+↓
+Aiven MySQL Database
+↓
+Email Alerts
+↓
+Power BI Dashboard
 
 ---
 
-## Author
+## 📸 Application Screenshots
+
+### Home Page
+
+(Add Screenshot)
+
+### Upload Sales
+
+(Add Screenshot)
+
+### Inventory Dashboard
+
+(Add Screenshot)
+
+### Restock Inventory
+
+(Add Screenshot)
+
+### Reports
+
+(Add Screenshot)
+
+### Processing History
+
+(Add Screenshot)
+
+### Power BI Dashboard
+
+(Add Screenshot)
+
+---
+
+## 📊 Power BI Dashboard
+
+The Power BI dashboard provides:
+
+* Inventory Overview
+* Low Stock Monitoring
+* Sales Analysis
+* KPI Tracking
+* Inventory Health Metrics
+
+---
+
+## 📧 Automated Email Alerts
+
+The system automatically sends:
+
+* Low Stock Alerts
+* Daily Inventory Processing Summary
+* Sales Processing Notifications
+
+---
+
+## 🎯 Business Impact
+
+This solution helps organizations:
+
+* Reduce manual inventory tracking
+* Improve stock visibility
+* Prevent stock shortages
+* Automate reporting workflows
+* Enable faster inventory decisions
+
+---
+
+## 📚 Learning Outcomes
+
+Through this project, I gained experience with:
+
+* Python Automation
+* Streamlit Development
+* MySQL Database Management
+* Cloud Database Hosting
+* Power BI Dashboarding
+* ETL Pipeline Design
+* Email Automation
+* Git & GitHub
+* Cloud Deployment
+
+---
+
+## 👨‍💻 Author
 
 Razan Mujawar
 
-Bachelor of Computer Science Engineering (AI & ML)
+GitHub:
+https://github.com/RazanMujawar
 
-Inventory Automation Platform Project
+LinkedIn:
+https://www.linkedin.com/in/razan-mujawar-a6bb23307/
+
+---
+
+⭐ If you found this project useful, consider giving it a star.
