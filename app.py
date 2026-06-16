@@ -326,7 +326,7 @@ def show_upload_sales():
 
             st.dataframe(
                             df,
-                            use_container_width=True
+                           width="stretch"
                         )
 
     if len(errors) == 0:
