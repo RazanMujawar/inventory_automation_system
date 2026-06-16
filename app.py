@@ -332,11 +332,17 @@ def show_upload_sales():
 
                     st.session_state.processed = True
                     
+                    st.rerun()
+                    
                 if st.session_state.processed:
 
                     st.success("✅ Inventory processing completed successfully!" )
 
                     st.balloons()
+                    
+                    if st.button("🔄 Upload Another File"):
+                        st.session_state.processed = False  # ← reset only when manager chooses to
+                        st.rerun()
 
                     
 
