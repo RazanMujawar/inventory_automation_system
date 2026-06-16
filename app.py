@@ -279,16 +279,16 @@ def show_home():
 def show_upload_sales():
 
     if "processed" not in st.session_state:
-
         st.session_state.processed = False
 
-    st.title(
-        "📤 Upload Sales"
-    )
+    st.title("📤 Upload Sales")
+
     col1, col2 = st.columns([2,3])
 
     with col1:
-        st.subheader ("Upload Today's Sales")
+
+        st.subheader("Upload Today's Sales")
+
         uploaded_file = st.file_uploader(
             "Choose Sales CSV File",
             type=["csv"],
@@ -296,45 +296,31 @@ def show_upload_sales():
         )
 
     with col2:
+
         if uploaded_file:
 
-            df = pd.read_csv(
-                    uploaded_file
-                )
+            df = pd.read_csv(uploaded_file)
 
             st.success(
-                    f"{uploaded_file.name} uploaded successfully!"
-                )
+                f"{uploaded_file.name} uploaded successfully!"
+            )
 
-            errors = validate_uploaded_file(
-                    df
-                )
+            errors = validate_uploaded_file(df)
 
-            invalid_ids = validate_product_ids(
-                    df
-                )
+            invalid_ids = validate_product_ids(df)
 
             for pid in invalid_ids:
-
-                    errors.append(
-                        f"Product ID {pid} not found")
-        
-            st.subheader(
-                            "Uploaded Data Preview"
-                        )
-
-            st.dataframe(
-                            df,
-                           width="stretch"
-                        )
+                errors.append(
+                    f"Product ID {pid} not found"
+                )
 
             if len(errors) == 0:
 
                 st.success(
-                            "Validation Passed!"
-                        )
+                    "Validation Passed!"
+                )
 
-        if st.button(
+                if st.button(
                     "🚀 Run Inventory Processing"
                 ):
 
@@ -347,28 +333,34 @@ def show_upload_sales():
                     ):
 
                         run_pipeline()
-                        st.cache_data.clear()
-                    st.session_state.processed = True
-                    
-                    
 
-        else:
+                    st.cache_data.clear()
+
+                    st.session_state.processed = True
+
+                    st.success(
+                        "Inventory processing completed!"
+                    )
+
+                    st.balloons()
+
+            else:
 
                 st.error(
                     "Validation Failed!"
                 )
 
                 for error in errors:
-
                     st.error(error)
 
-        if st.session_state.processed:
+            st.subheader(
+                "Uploaded Data Preview"
+            )
 
-                st.success(
-                    "Inventory processing completed!"
-                )
-
-                st.balloons()
+            st.dataframe(
+                df,
+                use_container_width=True
+            )
         
 
 
@@ -583,7 +575,7 @@ def show_history():
 
         today_files = history_df[history_df["Processed At"].str.contains(today)]
 
-    st.metric("Today's Files Processed",len(today_files))
+        st.metric("Today's Files Processed",len(today_files))
 
     with col2:
         st.metric("Today's Units Sold",history_df["Units Sold"].sum())
