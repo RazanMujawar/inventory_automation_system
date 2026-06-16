@@ -351,9 +351,8 @@ def show_upload_sales():
                     st.error(error)
 
     with col2:
+        st.subheader("Uploaded Data Preview")
         if uploaded_file:
-            st.subheader("Uploaded Data Preview")
-            df = pd.read_csv(uploaded_file)
             st.dataframe(df,use_container_width=True)
         
 
