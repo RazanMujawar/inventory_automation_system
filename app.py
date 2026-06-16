@@ -317,25 +317,30 @@ def show_upload_sales():
                     "Validation Passed!"
                 )
 
-                if st.button(
-                    "🚀 Run Inventory Processing"
-                ):
+                if st.button("🚀 Run Inventory Processing"):
+
                     st.write("STEP 1")
-                     
+
                     save_uploaded_file(uploaded_file)
-                    
+
                     st.write("STEP 2")
 
-                    with st.spinner("Processing inventory..."):
+                    try:
 
-                        run_pipeline()
-                    st.write("STEP 3")
+                        with st.spinner(
+                            "Processing inventory..."
+                        ):
+                            run_pipeline()
 
-                    st.cache_data.clear()
+                        st.write("STEP 3")
 
-                    st.session_state.processed = True
-                    
-                    st.toast("Inventory processing completed successfully!",icon="✅")
+                    except Exception as e:
+
+                        st.error(
+                            f"ERROR: {e}"
+                        )
+
+                        st.write("STEP ERROR")
 
                     
 
