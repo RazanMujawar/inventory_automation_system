@@ -354,7 +354,7 @@ def show_upload_sales():
     with col2:
         st.subheader("Uploaded Data Preview")
         if uploaded_file:
-            st.dataframe(df,use_container_width=True)
+            st.dataframe(df,use_container_width=True, hide_index = True)
         
 
 
