@@ -10,6 +10,7 @@ from modules.reports import generate_reports
 from modules.get_low_stock_products import get_low_stock_products
 from modules.send_email import send_summary_email
 from datetime import datetime
+from zoneinfo import ZoneInfo
 from modules.email_templates import get_reminder_email
 from dotenv import load_dotenv
 load_dotenv()
@@ -88,11 +89,10 @@ def run_pipeline():
                 connection.close()        
                 
                 
-                history = pd.DataFrame([
-                {
-                    "File Name": file,
-                    "Units Sold": total_products_sold,
-                    "Processed At":datetime.now(ZoneInfo("Asia/Kolkata")).strftime("%d-%b-%Y %I:%M %p")
+                history = pd.DataFrame
+                "File Name": file
+                "Units Sold": total_products_sold
+                "Processed At":datetime.now(ZoneInfo("Asia/Kolkata")).strftime("%d-%b-%Y %I:%M %p")
                 print("Pipeline completed successfully!")
                 
                 history.to_csv(
@@ -102,18 +102,11 @@ def run_pipeline():
                 index=False)
                 print("History record saved")
                 
-                
         except Exception as e:
 
             logger.error(
                 f"Error processing {file}: {str(e)}"
             )
-    
-
-    
-
-    
-    
-    
+   
 if __name__ == "__main__":
     run_pipeline()
