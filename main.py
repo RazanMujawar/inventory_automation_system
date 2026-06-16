@@ -82,33 +82,37 @@ def run_pipeline():
                 logger.info(f"{file} moved to processed folder")
 
                 print(f"{file} processed successfully!")
-
+                
+                total_products_sold = sales_df["quantity_sold"].sum()
+                connection.commit()
+                connection.close()        
+                
+                
+                history = pd.DataFrame([
+                {
+                    "File Name": file,
+                    "Units Sold": total_products_sold,
+                    "Processed At": datetime.now().strftime("%d-%b-%Y %I:%M %p")}])
+                print("Pipeline completed successfully!")
+                
+                history.to_csv(
+                "history.csv",
+                mode="a",
+                header=not os.path.exists("history.csv"),
+                index=False)
+                print("History record saved")
+                
+                
         except Exception as e:
 
             logger.error(
                 f"Error processing {file}: {str(e)}"
             )
-    total_products_sold = sales_df["quantity_sold"].sum()
-    print(e)
-    connection.commit()
-    connection.close()        
     
-    
-    history = pd.DataFrame([
-    {
-        "File Name": file,
-        "Units Sold": total_products_sold,
-        "Processed At": datetime.now().strftime("%d-%b-%Y %I:%M %p")}])
-    print("Pipeline completed successfully!")
 
     
 
-    history.to_csv(
-    "history.csv",
-    mode="a",
-    header=not os.path.exists("history.csv"),
-    index=False
-)
+    
     
     
 if __name__ == "__main__":
