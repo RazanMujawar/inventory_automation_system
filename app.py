@@ -317,8 +317,7 @@ def show_upload_sales():
             for pid in invalid_ids:
 
                     errors.append(
-                        f"Product ID {pid} not found"
-                    )
+                        f"Product ID {pid} not found")
         
             st.subheader(
                             "Uploaded Data Preview"
@@ -329,11 +328,11 @@ def show_upload_sales():
                            width="stretch"
                         )
 
-    if len(errors) == 0:
+            if len(errors) == 0:
 
-        st.success(
-                    "Validation Passed!"
-                )
+                st.success(
+                            "Validation Passed!"
+                        )
 
         if st.button(
                     "🚀 Run Inventory Processing"
