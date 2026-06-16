@@ -333,8 +333,7 @@ def show_upload_sales():
                         st.success(
                         "Inventory processing completed!"
                     )
-
-                    st.balloons()
+                        st.balloons()
 
                     st.cache_data.clear()
 
