@@ -336,9 +336,9 @@ def show_upload_sales():
 
                                     
 
-                else:
+            else:
 
-                        st.error("Validation Failed!")
+                st.error("Validation Failed!")
 
                 for error in errors:
                     st.error(error)
@@ -346,7 +346,7 @@ def show_upload_sales():
     with col2:
         st.subheader("Uploaded Data Preview")
         if uploaded_file:
-            st.dataframe(df,width="Stretch", hide_index = True)
+            st.dataframe(df,width="stretch", hide_index = True)
         
 
 
@@ -543,7 +543,7 @@ def show_history():
         st.dataframe(
             history_df,
             hide_index=True,
-            width="strecth"
+            width="stretch"
         )
 
     except Exception:
