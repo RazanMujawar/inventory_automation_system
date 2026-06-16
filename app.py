@@ -330,16 +330,17 @@ def show_upload_sales():
                     ):
 
                         run_pipeline()
+                        st.success(
+                        "Inventory processing completed!"
+                    )
+
+                    st.balloons()
 
                     st.cache_data.clear()
 
                     st.session_state.processed = True
 
-                    st.success(
-                        "Inventory processing completed!"
-                    )
-
-                    st.balloons()
+                    
 
             else:
 
