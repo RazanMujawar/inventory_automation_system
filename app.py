@@ -320,12 +320,16 @@ def show_upload_sales():
                 if st.button(
                     "🚀 Run Inventory Processing"
                 ):
-
+                    st.write("STEP 1")
+                     
                     save_uploaded_file(uploaded_file)
+                    
+                    st.write("STEP 2")
 
                     with st.spinner("Processing inventory..."):
 
                         run_pipeline()
+                    st.write("STEP 3")
 
                     st.cache_data.clear()
 
