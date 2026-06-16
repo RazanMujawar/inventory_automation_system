@@ -69,7 +69,7 @@ def run_pipeline():
                     get_low_stock_products()
                 )
 
-                processing_date = datetime.now().strftime("%d-%b-%Y %I:%M %p")
+                processing_date = datetime.now(ZoneInfo("Asia/Kolkata")).strftime("%d-%b-%Y %I:%M %p")
                 
                 send_summary_email(
                 processing_date=processing_date,
@@ -92,7 +92,7 @@ def run_pipeline():
                 {
                     "File Name": file,
                     "Units Sold": total_products_sold,
-                    "Processed At": datetime.now().strftime("%d-%b-%Y %I:%M %p")}])
+                    "Processed At":datetime.now(ZoneInfo("Asia/Kolkata")).strftime("%d-%b-%Y %I:%M %p")
                 print("Pipeline completed successfully!")
                 
                 history.to_csv(
