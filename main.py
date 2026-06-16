@@ -107,6 +107,7 @@ def run_pipeline():
             logger.error(
                 f"Error processing {file}: {str(e)}"
             )
+            raise
    
 if __name__ == "__main__":
     run_pipeline()
