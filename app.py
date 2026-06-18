@@ -669,8 +669,7 @@ with left_col:
         st.session_state.page = "Reports"
     
     st.link_button(
-        "📊 Open Power BI Dashboard",
-        "https://app.powerbi.com/groups/me/reports/6c7f3f8d-5c2b-4b40-abcc-db38c78c58d7/412b639c0503d8882a82?experience=power-bi"
+        "📊 Open Power BI Dashboard", https://app.powerbi.com/view?r=eyJrIjoiM2RkYTU1MDgtMmZlZC00MzAwLWE1NzQtYTA4ZTRjZTU5Mjk3IiwidCI6IjkzNjgyYTAyLTNmNjQtNDllNi1hYjY5LTU5NTAxNWJiNTllYyJ9
     )
 
     if st.button("📜 History"):
