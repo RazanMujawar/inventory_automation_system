@@ -204,6 +204,18 @@ Through this project, I gained experience with:
 
 ---
 
+## Documentation
+
+- BRD (Business Requirements Document)
+- FRD (Functional Requirements Document)
+- UAT (User Acceptance Testing)
+- Architecture Diagram
+- Database Schema
+
+Available under `/docs`.
+
+---
+
 ## 👨‍💻 Author
 
 Razan Mujawar
