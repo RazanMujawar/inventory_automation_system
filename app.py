@@ -9,6 +9,10 @@ from reports.reports import get_report_data
 from dotenv import load_dotenv
 load_dotenv()
 from zoneinfo import ZoneInfo
+from modules.add_product import (
+    add_product,
+    product_exists
+)
 
 st.set_page_config(
     page_title="Lumina & Co.",
@@ -438,6 +442,89 @@ def show_inventory():
         st.warning(
             f"⚠ Low Stock Products: {products}"
         )
+        
+
+def show_add_product():
+
+    st.title("➕ Add Product")
+
+    st.subheader("Add New Product")
+
+    product_name = st.text_input("Product Name")
+
+    product_name = " ".join(product_name.strip().split())
+
+    category = st.selectbox(
+        "Category",
+        [
+            "Electronics",
+            "Accessories",
+            "Peripherals",
+            "Networking",
+            "Office Equipment",
+            "Storage"
+        ]
+    )
+
+    price = st.number_input(
+        "Price",
+        min_value=0.0,
+        step=1.0
+    )
+
+    stock_quantity = st.number_input(
+        "Initial Stock Quantity",
+        min_value=0,
+        step=1
+    )
+
+    reorder_level = st.number_input(
+        "Reorder Level",
+        min_value=0,
+        step=1
+    )
+
+    if st.button("➕ Add Product",key="add_product_submit"):
+
+        if product_name.strip() == "":
+            st.error(
+                "Product name is required"
+            )
+        elif len(product_name) > 100:
+            st.error(
+                "Product name cannot exceed 100 characters"
+            )
+            
+        elif product_exists(product_name):
+            st.error(
+                "Product already exists"
+            )
+        if price <= 0:
+            st.error(
+                "Price must be greater than 0"
+            )
+
+        elif reorder_level <= 0:
+            st.error(
+                "Reorder level must be greater than 0"
+            )
+        else:
+
+            product_id = add_product(
+                product_name,
+                category,
+                price,
+                stock_quantity,
+                reorder_level
+            )
+
+            st.success(
+                f"Product added successfully! Product ID: {product_id}"
+            )
+
+            st.cache_data.clear()
+
+        
 def show_restock():
 
     st.title(
@@ -592,7 +679,7 @@ def show_history():
     with col2:
         st.metric("Today's Units Sold",history_df["Units Sold"].sum())
 
-    
+   
 
 def get_next_refresh():
 
@@ -662,6 +749,9 @@ with left_col:
     if st.button("📋 Show Inventory"):
         st.session_state.page = "Inventory"
 
+    if st.button("➕ Add Product"):
+        st.session_state.page = "Add Product"
+    
     if st.button("📦 Restock Inventory"):
         st.session_state.page = "Restock"
         
@@ -676,6 +766,8 @@ with left_col:
     if st.button("📜 History"):
         st.session_state.page = "History"
 
+    
+        
     next_refresh = get_next_refresh()
 
     remaining = (
@@ -708,7 +800,10 @@ with right_col:
 
     elif st.session_state.page == "Inventory":
         show_inventory()
-
+        
+    elif st.session_state.page == "Add Product":
+        show_add_product()
+    
     elif st.session_state.page == "Restock":
         show_restock()
         
