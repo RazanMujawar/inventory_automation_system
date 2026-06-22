@@ -91,6 +91,14 @@ This project automates the complete inventory workflow by:
 * Update inventory quantities
 * Instantly refresh stock levels
 
+### Product Management
+
+* Add new inventory products directly from the application
+* Auto-generated Product IDs using MySQL AUTO_INCREMENT
+* Product validation and duplicate prevention
+* Category assignment and reorder level configuration
+* Immediate inventory visibility after creation
+
 ### 📊 Reporting Dashboard
 
 * Inventory analytics
