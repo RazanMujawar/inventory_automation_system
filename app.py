@@ -13,6 +13,11 @@ from modules.add_product import (
     add_product,
     product_exists
 )
+from modules.add_category import (
+    add_category,
+    category_exists,
+    get_categories
+)
 
 st.set_page_config(
     page_title="Lumina & Co.",
@@ -448,24 +453,66 @@ def show_add_product():
 
     st.title("➕ Add Product")
 
-    st.subheader("Add New Product")
+    col1, col2 = st.columns([1,1])
 
+    with col1:
+
+        category = st.selectbox(
+            "Category",
+            get_categories()
+        )
+
+    with col2:
+
+        new_category = st.text_input(
+            "Create New Category"
+        )
+
+        if st.button(
+            "➕ Add Category",
+            key="add_category_btn"
+        ):
+
+            new_category = " ".join(
+                new_category.strip().split()
+            )
+
+            if new_category == "":
+
+                st.error(
+                    "Enter category name"
+                )
+
+            elif len(new_category) > 100:
+
+                st.error(
+                    "Maximum 100 characters"
+                )
+
+            elif category_exists(
+                new_category
+            ):
+
+                st.error(
+                    "Category already exists"
+                )
+
+            else:
+
+                add_category(
+                    new_category
+                )
+
+                st.success(
+                    "Category Added!"
+                )
+
+                st.rerun()
+    
     product_name = st.text_input("Product Name")
 
     product_name = " ".join(product_name.strip().split())
-
-    category = st.selectbox(
-        "Category",
-        [
-            "Electronics",
-            "Accessories",
-            "Peripherals",
-            "Networking",
-            "Office Equipment",
-            "Storage"
-        ]
-    )
-
+    
     price = st.number_input(
         "Price",
         min_value=0.0,
