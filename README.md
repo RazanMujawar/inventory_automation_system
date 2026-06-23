@@ -85,6 +85,8 @@ This project automates the complete inventory workflow by:
 * View current inventory levels
 * Color-coded stock status
 * Search and monitor products
+* Product Management
+* Category Management
 
 ### ➕ Restock Management
 
@@ -116,20 +118,15 @@ This project automates the complete inventory workflow by:
 
 ## 🏗️ System Architecture
 
-Daily Sales CSV
-↓
-Streamlit Application
-↓
-Python ETL Pipeline
-↓
-Aiven MySQL Database
-↓
-Email Alerts
-↓
-Power BI Dashboard
+![Descriptive alt text](docs/Lumina%20inventor%20architecture.drawio.png)
 
 ---
 
+#### Database Schema
+
+![Descriptive alt text](docs/Lumina%20ER%20daigram.drawio.png)
+
+---
 ## 📸 Application Screenshots
 
 ### Home Page
@@ -143,6 +140,9 @@ Power BI Dashboard
 ### Inventory Dashboard
 
 ![Descriptive alt text](assests/inventory.png)
+
+#### Add Products
+![Descriptive alt text](assests/add_products.png)
 
 ### Restock Inventory
 
