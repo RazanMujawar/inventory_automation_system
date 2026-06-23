@@ -116,15 +116,7 @@ This project automates the complete inventory workflow by:
 
 ---
 
-## 🏗️ System Architecture
 
-![Descriptive alt text](docs/Lumina%20inventor%20architecture.drawio.png)
-
----
-
-#### Database Schema
-
-![Descriptive alt text](docs/Lumina%20ER%20daigram.drawio.png)
 
 ---
 ## 📸 Application Screenshots
