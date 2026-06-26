@@ -56,8 +56,10 @@ def run_pipeline():
                     quantity = int(row["quantity_sold"])
                     update_inventory(connection, product_id, quantity) 
                 
-                logger.info("Inventory updated")
+                    logger.info("Inventory updated")
 
+                connection.commit() 
+                
                 generate_alerts()
                 
                 logger.info("Alerts generated")
