@@ -18,6 +18,16 @@ from modules.add_category import (
     category_exists,
     get_categories
 )
+from modules.manage_product import (
+    get_products,
+    get_product_details,
+    update_product,
+    product_exists_except_current
+)
+from modules.audit_log import (
+    add_audit_log,
+    get_audit_logs
+)
 
 st.set_page_config(
     page_title="Lumina & Co.",
@@ -42,9 +52,13 @@ def get_inventory():
         SELECT
             product_id,
             product_name,
+            category,
+            price,
             stock_quantity,
             reorder_level
         FROM products
+        WHERE status='Active'
+        ORDER BY product_name
         """
     )
 
@@ -194,7 +208,43 @@ def validate_product_ids(df):
             )
 
     return invalid_ids   
-    
+
+def validate_inactive_products(df):
+
+    conn = get_connection()
+    cursor = conn.cursor()
+
+    cursor.execute("""
+        SELECT
+            product_id,
+            product_name
+        FROM products
+        WHERE status='Inactive'
+    """)
+
+    inactive_products = {
+        row[0]: row[1]
+        for row in cursor.fetchall()
+    }
+
+    cursor.close()
+    conn.close()
+
+    inactive_found = []
+
+    for pid in df["product_id"]:
+
+        if pid in inactive_products:
+
+            inactive_found.append(
+                (
+                    pid,
+                    inactive_products[pid]
+                )
+            )
+
+    return inactive_found
+ 
 def show_home():
     col1, col2, col3 = st.columns([1,3,1])
 
@@ -203,15 +253,72 @@ def show_home():
         "images/logo.png",
         width=550
     )
-    st.subheader("About Us")
+    st.markdown("---")
+    (
+    total_products,
+    total_stock,
+    low_stock,
+    open_alerts
+    ) = get_report_data()
+
+    history_df = pd.read_csv("history.csv")
+
+    history_df["Processed At"] = pd.to_datetime(
+        history_df["Processed At"],
+        format="%d-%b-%Y %I:%M %p"
+    )
+
+    today = datetime.now(
+        ZoneInfo("Asia/Kolkata")
+    ).date()
+
+    today_history = history_df[
+        history_df["Processed At"].dt.date == today
+    ]
+
+    col1, col2, col3, col4 = st.columns(4)
+
+    with col1:
+        st.metric(
+            "📦 Products",
+            total_products
+        )
+
+    with col2:
+        st.metric(
+            "📈 Total Stock",
+            total_stock
+        )
+
+    with col3:
+        st.metric(
+            "🚨 Open Alerts",
+            open_alerts
+        )
+
+    with col4:
+        st.metric(
+            "📂 Files Today",
+            len(today_history)
+        )
+    
+    st.markdown("---")
+
+    st.subheader("📖 About Lumina & Co.")
 
     st.write("""
-    Lumina & Co. is an Inventory Automation
-    Platform designed to streamline
-    inventory tracking, sales processing,
-    low-stock monitoring, automated alerts,
-    and reporting.
+    Lumina & Co. is an Inventory Automation Platform
+    designed to automate sales processing, inventory
+    tracking, low-stock monitoring, audit logging,
+    and Power BI reporting.
+
+    The platform validates uploaded sales files,
+    updates inventory automatically, generates alerts,
+    maintains activity history, and provides real-time
+    business insights through interactive dashboards.
     """)
+
+    st.markdown("---")
 
     col1, col2, col3 = st.columns([1,3,1])
 
@@ -221,71 +328,129 @@ def show_home():
         width=800
     )
     st.markdown("---")
+    
+    left, right = st.columns(2)
+    with left:
+
+        st.subheader("🛠 Technology Stack")
+
+        st.markdown("""
+            - 🐍 Python
+
+            - 🌐 Streamlit
+
+            - 🗄️ MySQL
+
+            - 📊 Power BI
+
+            - 🐼 Pandas
+
+            - 📧 SMTP Email
+
+            - 🔄 ETL Pipeline
+
+            - 📝 Audit Logs
+        """)
+    
+    with right:
+
+        st.subheader("📜 Recent Activity")
+        logs = get_audit_logs()
+        if logs:
+
+            recent_logs = pd.DataFrame(logs).head(2)
+
+            for _, row in recent_logs.iterrows():
+
+                st.markdown(
+                    f"""
+        **{row['action_type']}**
+
+        {row['description']}
+
+        <small>{row['created_at']}</small>
+
+        ---
+        """,
+                    unsafe_allow_html=True
+                )
+
+        else:
+
+            st.info("No recent activity.")
+        
+    
+    st.markdown("---")  
+    
 
     st.subheader(
         "🚀 Platform Features" 
     )
+    col1, col2, col3 = st.columns([1,3,1])
+    with col2:
+        st.markdown("""
+            <div style="text-align:center; line-height:1.5; font-size:22px;">
 
-    st.markdown("""
+            <b>📤 Upload Sales File</b>
 
+            <div style="font-size:24px;">↓</div>
 
-    **1. 📤 Sales Upload**
+            <b>✅ Validate Data</b>
 
-    &nbsp;&nbsp;&nbsp;&nbsp; - Upload and validate daily sales files.
+            <div style="font-size:24px;">↓</div>
 
-    <br>
+            <b>📦 Update Inventory</b>
 
-    **2. 📦 Inventory Management**
+            <div style="font-size:24px;">↓</div>
 
-    &nbsp;&nbsp;&nbsp;&nbsp; - Monitor stock levels in real time.
+            <b>🚨 Generate Alerts</b>
 
-    <br>
+            <div style="font-size:24px;">↓</div>
 
-    **3. ⚠ Automated Alerts**
+            <b>📑 Generate Reports</b>
 
-    &nbsp;&nbsp;&nbsp;&nbsp; - Receive low stock notifications.
+            <div style="font-size:24px;">↓</div>
 
-    <br>
+            <b>📊 Power BI Dashboard</b>
 
-    **4. 📊 Power BI Dashboard**
+            </div>
+            """, unsafe_allow_html=True)
 
-    &nbsp;&nbsp;&nbsp;&nbsp; - Visualize inventory and sales analytics.
-    """, unsafe_allow_html=True)
-    
-    st.markdown("---")
-
-    st.subheader("🔄 How It Works")
-    st.markdown("""
-
-        1. Upload 
-        
-        2. Validate
-
-        3. Update
-
-        4. Alerts
-        
-        5. Reports
-        """)
-
-    
     st.markdown("---")
     
     st.subheader("System Information")
 
     st.write("""
         
-    - **Database**      : MySQL
+    - **💾 Database**      : MySQL
     
-    - **Analytics**     : Power BI
+    - **📊 Analytics**     : Power BI
     
-    - **Alerts**        : Email Notifications
+    - **📧 Alerts**        : Email Notifications
     
-    - **Deployment**    : Streamlit
+    - **🌐 Frontend**    : Streamlit
     
-    - **Refresh Times** : 9AM | 12PM | 3PM | 6PM | 9PM
+    - **🐍 Backend**    : Python
+    
+    - **⏱ Refresh Times** : 9AM | 12PM | 3PM | 6PM | 9PM
         """)
     
+    st.markdown("---")
+
+    st.markdown(
+        """
+    <div style='text-align:center;color:gray;font-size:14px;'>
+
+    Inventory Automation Platform • Version 1.0
+
+    Built with ❤️ using Python • Streamlit • MySQL • Power BI
+
+    © 2026 Lumina & Co.
+
+    </div>
+    """,
+        unsafe_allow_html=True
+    )
 def show_upload_sales():
 
     if "processed" not in st.session_state:
@@ -333,7 +498,13 @@ def show_upload_sales():
             if "product_id" in df.columns:
 
                 invalid_ids = validate_product_ids(df)
+                inactive_products = validate_inactive_products(df)
 
+                for pid, name in inactive_products:
+
+                    errors.append(
+                        f"Inactive Product: {name} (ID: {pid})"
+                    )
                 for pid in invalid_ids:
                     errors.append(
                         f"Product ID {pid} not found"
@@ -422,12 +593,14 @@ def show_inventory():
     
     inventory_df = pd.DataFrame(
         inventory,
-        columns=[
-            "Product ID",
-            "Product Name",
-            "Current Stock",
-            "Reorder Level"
-        ]
+            columns=[
+                "Product ID",
+                "Product Name",
+                "Category",
+                "Price",
+                "Current Stock",
+                "Reorder Level"
+            ]
     )
 
     styled_df = inventory_df.style.apply(
@@ -435,7 +608,7 @@ def show_inventory():
     axis=1
 )
 
-    st.dataframe(styled_df,width="stretch")
+    st.dataframe(styled_df,width="stretch", hide_index=True)
     low_stock_items = inventory_df[inventory_df["Current Stock"]<=inventory_df["Reorder Level"]]
 
     if not low_stock_items.empty:
@@ -452,8 +625,13 @@ def show_inventory():
 def show_add_product():
 
     st.title("➕ Add Product")
+    if "product_added" in st.session_state:
 
-    col1, col2 = st.columns([1,1])
+        st.success(st.session_state.product_added)
+
+        del st.session_state.product_added
+
+    col1, col2 , col3= st.columns([2,2,1])
 
     with col1:
 
@@ -465,9 +643,12 @@ def show_add_product():
     with col2:
 
         new_category = st.text_input(
-            "Create New Category"
-        )
-
+        "Create New Category",
+        key="new_category")
+        
+    with col3:
+        st.write("")
+        st.write("")
         if st.button(
             "➕ Add Category",
             key="add_category_btn"
@@ -502,75 +683,281 @@ def show_add_product():
                 add_category(
                     new_category
                 )
-
-                st.success(
-                    "Category Added!"
+                add_audit_log(
+                    "CREATE_CATEGORY",
+                    f"Created new category '{new_category}'."
                 )
+                st.success("Category Added!")
+
+                del st.session_state["new_category"]
 
                 st.rerun()
     
-    product_name = st.text_input("Product Name")
+    left, right = st.columns(2)
 
-    product_name = " ".join(product_name.strip().split())
-    
-    price = st.number_input(
-        "Price",
-        min_value=0.0,
-        step=1.0
-    )
+    with left:
 
-    stock_quantity = st.number_input(
-        "Initial Stock Quantity",
-        min_value=0,
-        step=1
-    )
+        product_name = st.text_input(
+            "Product Name"
+        )
 
-    reorder_level = st.number_input(
-        "Reorder Level",
-        min_value=0,
-        step=1
-    )
+    with right:
 
-    if st.button("➕ Add Product",key="add_product_submit"):
+        price = st.number_input(
+            "Price",
+            min_value=0.0,
+            step=1.0
+        )
 
-        if product_name.strip() == "":
-            st.error(
-                "Product name is required"
-            )
-        elif len(product_name) > 100:
-            st.error(
-                "Product name cannot exceed 100 characters"
-            )
-            
-        elif product_exists(product_name):
-            st.error(
-                "Product already exists"
-            )
-        if price <= 0:
-            st.error(
-                "Price must be greater than 0"
-            )
+    left, right = st.columns(2)
 
-        elif reorder_level <= 0:
-            st.error(
-                "Reorder level must be greater than 0"
-            )
-        else:
+    with left:
 
-            product_id = add_product(
-                product_name,
-                category,
-                price,
-                stock_quantity,
-                reorder_level
-            )
+        stock_quantity = st.number_input(
+            "Initial Stock Quantity",
+            min_value=0
+        )
 
-            st.success(
-                f"Product added successfully! Product ID: {product_id}"
-            )
+    with right:
 
+        reorder_level = st.number_input(
+            "Reorder Level",
+            min_value=0
+        )
+
+    left, center, right = st.columns([2,1,2])
+    with center:
+
+        if st.button("➕ Add Product",key="add_product_submit"):
+
+            if product_name.strip() == "":
+                st.error(
+                    "Product name is required"
+                )
+            elif len(product_name) > 100:
+                st.error(
+                    "Product name cannot exceed 100 characters"
+                )
+                
+            elif product_exists(product_name):
+                st.error(
+                    "Product already exists"
+                )
+            elif price <= 0:
+                st.error(
+                    "Price must be greater than 0"
+                )
+
+            elif reorder_level <= 0:
+                st.error(
+                    "Reorder level must be greater than 0"
+                )
+            else:
+
+                product_id = add_product(
+                    product_name,
+                    category,
+                    price,
+                    stock_quantity,
+                    reorder_level
+                )
+                add_audit_log(
+                    "ADD_PRODUCT",
+                    f"Added Product ID {product_id} - '{product_name}' in category '{category}' with price ₹{price:.2f}."
+                )
+                
+
+            st.session_state.product_added = (f"✅ Product added successfully! Product ID: {product_id}")
             st.cache_data.clear()
+            st.rerun()
 
+
+
+def show_manage_products():
+
+    st.title("🛠 Manage Products")
+    products = get_products()
+    
+    if st.session_state.get(
+    "product_updated",
+    False):
+
+        st.success(
+            "✅ Product updated successfully!"
+        )
+
+        st.session_state.product_updated = False
+    
+    if not products:
+        st.warning("No products found.")
+        return
+    
+    
+    
+    product_options = {
+        f"{pid} - {name}": pid
+        for pid, name in products
+    }
+
+    selected = st.selectbox(
+        "Select Product",
+        list(product_options.keys())
+    )
+    
+    product_id = product_options[selected]
+
+    product = get_product_details(product_id)
+        
+    if product["status"] == "Active":
+
+            st.success("🟢 Current Status : Active")
+
+    else:
+
+            st.error("🔴 Current Status : Inactive")
+
+    st.divider()
+    left, right = st.columns(2)
+    with left:
+        st.text_input(
+                "Product ID",
+                value=product["product_id"],
+                disabled=True
+            )
+    with right: 
+        product_name = st.text_input(
+            "Product Name",
+            value=product["product_name"]
+        )
+    with left: 
+        categories = get_categories()
+
+        category = st.selectbox(
+            "Category",
+            categories,
+            index=categories.index(product["category"])
+        )
+    with right: 
+        price = st.number_input(
+            "Price",
+            min_value=0.01,
+            value=float(product["price"])
+        )
+    with left:
+        stock_quantity = st.number_input(
+            "Stock Quantity",
+            value=int(product["stock_quantity"]),
+            disabled=True
+        )
+    with right:
+        reorder_level = st.number_input(
+            "Reorder Level",
+            min_value=1,
+            value=int(product["reorder_level"])
+        )
+    with left: 
+        status = st.selectbox(
+        "Status",
+        ["Active", "Inactive"],
+        index=0 if product["status"] == "Active" else 1
+        )
+    with right: 
+        st.write("")
+        st.write("")
+        if st.button(
+            "💾 Save Changes",
+            key="update_product_btn"
+        ):
+
+            product_name = " ".join(
+                product_name.strip().split()
+            )
+
+            if product_name == "":
+
+                st.error("Product name is required.")
+
+            elif len(product_name) > 100:
+
+                st.error(
+                    "Maximum 100 characters allowed."
+                )
+
+            elif product_exists_except_current(
+                product_name,
+                product_id
+            ):
+
+                st.error(
+                    "Product already exists."
+                )
+
+            else:
+                
+                old_name = product["product_name"]
+                old_category = product["category"]
+                old_price = product["price"]
+                old_reorder = product["reorder_level"]
+                old_status = product["status"]
+
+                changes = []
+
+                if old_name != product_name:
+                    changes.append(
+                        f"Name: {old_name} → {product_name}"
+                    )
+
+                if old_category != category:
+                    changes.append(
+                        f"Category: {old_category} → {category}"
+                    )
+
+                if old_price != price:
+                    changes.append(
+                        f"Price: ₹{old_price} → ₹{price}"
+                    )
+
+                if old_reorder != reorder_level:
+                    changes.append(
+                        f"Reorder Level: {old_reorder} → {reorder_level}"
+                    )
+
+                if old_status != status:
+                    changes.append(
+                        f"Status: {old_status} → {status}"
+                    )
+
+                if not changes:
+
+                    st.info("No changes detected.")
+
+                    return
+
+                update_product(
+                    product_id,
+                    product_name,
+                    category,
+                    price,
+                    reorder_level,
+                    status
+                )
+                
+                description = (
+                    f"Product ID: {product_id}\n"
+                    f"Product: {old_name}\n\n"
+                    + "\n".join(changes)
+                )
+
+                add_audit_log(
+                    "UPDATE_PRODUCT",
+                    description
+                )
+
+                st.cache_data.clear()
+
+                st.session_state.product_updated = True
+
+                st.rerun()
         
 def show_restock():
 
@@ -579,40 +966,47 @@ def show_restock():
     )
 
     inventory = get_inventory()
-
+    
     inventory_df = pd.DataFrame(
         inventory,
         columns=[
             "Product ID",
             "Product Name",
             "Current Stock",
-            "Reorder Level"
+            "Reorder Level",
+            "Price",
+            "Category"
         ]
     )
+    
+    left, right = st.columns(2)
 
-    selected_product = st.selectbox(
-        "Select Product",
-        inventory_df["Product Name"]
-    )
-
-    restock_quantity = st.number_input(
-        "Restock Quantity",
-        min_value=1,
-        step=1
-    )
-
-    if st.button("Update Inventory"):
-
-        restock_inventory(
-            selected_product,
-            restock_quantity
+    with left:
+        selected_product = st.selectbox(
+            "Select Product",
+            inventory_df["Product Name"]
         )
-
-        st.cache_data.clear()
-
-        st.success(
-            f"{selected_product} restocked successfully!"
+    with right:
+        restock_quantity = st.number_input(
+            "Restock Quantity",
+            min_value=1,
+            step=1
         )
+        
+    left, center, right = st.columns([2,1,2])
+    with center:
+        if st.button("Update Inventory"):
+
+            restock_inventory(
+                selected_product,
+                restock_quantity
+            )
+
+            st.cache_data.clear()
+
+            st.success(
+                f"{selected_product} restocked successfully!"
+            )
 
 def show_reports():
 
@@ -627,7 +1021,22 @@ def show_reports():
         open_alerts
     ) = get_report_data()
     
-    col1, col2 = st.columns(2)
+    
+    history_df = pd.read_csv("history.csv")
+
+    history_df["Processed At"] = pd.to_datetime(
+        history_df["Processed At"],
+        format="%d-%b-%Y %I:%M %p"
+    )
+
+    today = datetime.now(
+        ZoneInfo("Asia/Kolkata")
+    ).date()
+
+    today_history = history_df[
+        history_df["Processed At"].dt.date == today
+    ]
+    col1, col2, col3 = st.columns(3)
 
     with col1:
         st.metric(
@@ -640,28 +1049,60 @@ def show_reports():
             "📈 Total Stock",
             total_stock
         )
-
-    col3, col4 = st.columns(2)
-
     with col3:
         st.metric(
             "⚠ Low Stock Items",
             low_stock
         )
-
-    with col4:
+    col4, col5, col6= st.columns(3)
+    with col6:
         st.metric(
             "🚨 Open Alerts",
             open_alerts
         )
         
-    inventory = get_inventory()
+    with col4:
+        st.metric(
+            "📤 Files Processed Today",
+            len(today_history)
+        )
 
+    with col5:
+        st.metric(
+            "📊 Units Sold Today",
+            int(today_history["Units Sold"].sum())
+        )    
+        inventory = get_inventory()
+        
+    with st.expander("📂 View Today's Processed Files"):
+
+        if today_history.empty:
+
+            st.info(
+                "No files processed today."
+            )
+
+        else:
+
+            st.dataframe(
+                today_history[
+                    [
+                        "File Name",
+                        "Units Sold",
+                        "Processed At"
+                    ]
+                ],
+                hide_index=True,
+                width="stretch"
+            )
+            
     inventory_df = pd.DataFrame(
         inventory,
         columns=[
             "Product ID",
             "Product Name",
+            "Category",
+            "Price",
             "Current Stock",
             "Reorder Level"
         ]
@@ -681,51 +1122,65 @@ def show_reports():
             "Current Stock",
             "Reorder Level"
         ]
-    ]
+    ], hide_index=True
 )
     
     st.markdown("---")
 
 def show_history():
 
-    st.title("📜 Processing History")
+    st.title("📜 Audit Logs")
 
-    if not os.path.exists("history.csv"):
-        st.info("No processing history available.")
+    logs = get_audit_logs()
+
+    if not logs:
+
+        st.info("No audit logs available.")
         return
 
-    try:
+    logs_df = pd.DataFrame(logs)
 
-        history_df = pd.read_csv(
-            "history.csv"
-        )
+    logs_df = logs_df.rename(
+        columns={
+            "log_id": "Log ID",
+            "action_type": "Action",
+            "description": "Description",
+            "created_at": "Timestamp"
+        }
+    )
 
-        st.dataframe(
-            history_df,
-            hide_index=True,
-            width="stretch"
-        )
+    logs_df = logs_df[
+        [
+            "Log ID",
+            "Action",
+            "Description",
+            "Timestamp"
+        ]
+    ]
 
-    except Exception:
+    st.dataframe(
+        logs_df,
+        width="stretch",
+        hide_index=True
+    )
 
-        st.warning(
-            "No history records found."
-        )
-        return
-    
+    st.markdown("---")
+
     col1, col2 = st.columns(2)
 
     with col1:
+        today = datetime.now(
+            ZoneInfo("Asia/Kolkata")
+        ).date()
 
-        today = datetime.now(ZoneInfo("Asia/Kolkata")).strftime("%d-%b-%Y")
+        today_logs = pd.to_datetime(
+            logs_df["Timestamp"]
+        ).dt.date == today
 
-        today_files = history_df[history_df["Processed At"].str.contains(today)]
-
-        st.metric("Today's Files Processed",len(today_files))
-
-    with col2:
-        st.metric("Today's Units Sold",history_df["Units Sold"].sum())
-
+        st.metric(
+            "Today's Activities",
+            today_logs.sum()
+        )
    
 
 def get_next_refresh():
@@ -771,7 +1226,7 @@ with divider_col:
         """
         <div style="
             border-left:1px solid #444;
-            height:100vh;
+            height:250vh;
         ">
         </div>
         """,
@@ -798,6 +1253,9 @@ with left_col:
 
     if st.button("➕ Add Product"):
         st.session_state.page = "Add Product"
+        
+    if st.button("🛠 Manage Products"):
+        st.session_state.page = "Manage Products"
     
     if st.button("📦 Restock Inventory"):
         st.session_state.page = "Restock"
@@ -805,13 +1263,15 @@ with left_col:
     if st.button("📑 Reports"):
         st.session_state.page = "Reports"
     
+    if st.button("📜 Audit Logs"):
+        st.session_state.page = "Audit Logs"
+    
     st.link_button(
         "📊 Open Power BI Dashboard",
         "https://app.powerbi.com/view?r=eyJrIjoiM2RkYTU1MDgtMmZlZC00MzAwLWE1NzQtYTA4ZTRjZTU5Mjk3IiwidCI6IjkzNjgyYTAyLTNmNjQtNDllNi1hYjY5LTU5NTAxNWJiNTllYyJ9"
     )
 
-    if st.button("📜 History"):
-        st.session_state.page = "History"
+    
 
     
         
@@ -851,13 +1311,18 @@ with right_col:
     elif st.session_state.page == "Add Product":
         show_add_product()
     
+    elif st.session_state.page == "Manage Products":
+        show_manage_products() 
+        
     elif st.session_state.page == "Restock":
         show_restock()
         
     elif st.session_state.page == "Reports":
         show_reports()
-        
+    
+    elif st.session_state.page == "Audit Logs":
+        show_history()
+            
     elif st.session_state.page == "Power BI Dashboard":
         show_reports()
-    elif st.session_state.page == "History":
-        show_history()
+    
