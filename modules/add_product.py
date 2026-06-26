@@ -19,10 +19,12 @@ def add_product(
         category,
         price,
         stock_quantity,
-        reorder_level
+        reorder_level,
+        status
     )
     VALUES
     (
+        %s,
         %s,
         %s,
         %s,
@@ -38,7 +40,8 @@ def add_product(
             category,
             price,
             stock_quantity,
-            reorder_level
+            reorder_level,
+            "Active"
         )
     )
 
