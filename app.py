@@ -982,7 +982,7 @@ def show_restock():
                 selected_product,
                 restock_quantity
             )
-
+            add_audit_log("RESTOCK_PRODUCT",f"Restocked '{selected_product}' by {restock_quantity} units.")
             st.cache_data.clear()
         
             
