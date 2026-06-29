@@ -417,25 +417,6 @@ def show_home():
             """, unsafe_allow_html=True)
 
     st.markdown("---")
-    
-    st.subheader("System Information")
-
-    st.write("""
-        
-    - **💾 Database**      : MySQL
-    
-    - **📊 Analytics**     : Power BI
-    
-    - **📧 Alerts**        : Email Notifications
-    
-    - **🌐 Frontend**    : Streamlit
-    
-    - **🐍 Backend**    : Python
-    
-    - **⏱ Refresh Times** : 9AM | 12PM | 3PM | 6PM | 9PM
-        """)
-    
-    st.markdown("---")
 
     st.markdown(
         """
@@ -445,7 +426,7 @@ def show_home():
 
     Built with ❤️ using Python • Streamlit • MySQL • Power BI
 
-    © 2026 Lumina & Co.
+    © 2026 Lumina & Co. by Razan Mujawar
 
     </div>
     """,
@@ -1003,7 +984,8 @@ def show_restock():
             )
 
             st.cache_data.clear()
-
+        
+            
             st.success(
                 f"{selected_product} restocked successfully!"
             )
