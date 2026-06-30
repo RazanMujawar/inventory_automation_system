@@ -1205,7 +1205,9 @@ def show_history():
 
 def get_next_refresh():
 
-    now = datetime.now()
+    now = datetime.now(
+    ZoneInfo("Asia/Kolkata")
+)
 
     refresh_hours = [
         9,
@@ -1298,8 +1300,10 @@ with left_col:
     next_refresh = get_next_refresh()
 
     remaining = (
-        next_refresh -
-        datetime.now()
+    next_refresh -
+    datetime.now(
+        ZoneInfo("Asia/Kolkata")
+    )
     )
 
     hours = remaining.seconds // 3600
