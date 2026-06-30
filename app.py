@@ -665,7 +665,7 @@ def show_add_product():
                     new_category
                 )
                 add_audit_log(
-                    "CREATE_CATEGORY",
+                    "📁 CREATE_CATEGORY",
                     f"Created new category '{new_category}'."
                 )
                 st.success("Category Added!")
@@ -707,50 +707,65 @@ def show_add_product():
         )
 
     left, center, right = st.columns([2,1,2])
+
+    submitted = False
+
     with center:
+        submitted = st.button(
+            "➕ Add Product",
+            key="add_product_submit"
+        )
 
-        if st.button("➕ Add Product",key="add_product_submit"):
+    if submitted:
 
-            if product_name.strip() == "":
-                st.error(
-                    "Product name is required"
-                )
-            elif len(product_name) > 100:
-                st.error(
-                    "Product name cannot exceed 100 characters"
-                )
-                
-            elif product_exists(product_name):
-                st.error(
-                    "Product already exists"
-                )
-            elif price <= 0:
-                st.error(
-                    "Price must be greater than 0"
-                )
+        if product_name.strip() == "":
+            st.error("Product name is required")
 
-            elif reorder_level <= 0:
-                st.error(
-                    "Reorder level must be greater than 0"
-                )
-            else:
+        elif len(product_name) > 100:
+            st.error("Product name cannot exceed 100 characters")
 
-                product_id = add_product(
-                    product_name,
-                    category,
-                    price,
-                    stock_quantity,
-                    reorder_level
-                )
-                add_audit_log(
-                    "ADD_PRODUCT",
-                    f"Added Product ID {product_id} - '{product_name}' in category '{category}' with price ₹{price:.2f}."
-                )
-                
+        elif product_exists(product_name):
+            st.error("Product already exists")
 
-            st.session_state.product_added = (f"✅ Product added successfully! Product ID: {product_id}")
+        elif price <= 0:
+            st.error("Price must be greater than 0")
+
+        elif reorder_level <= 0:
+            st.error("Reorder level must be greater than 0")
+
+        else:
+
+            product_id = add_product(
+                product_name,
+                category,
+                price,
+                stock_quantity,
+                reorder_level
+            )
+
+            add_audit_log(
+                "➕ ADD_PRODUCT",
+                f"Added Product ID {product_id} - '{product_name}' in category '{category}' with price ₹{price:.2f}."
+            )
+
+            st.session_state.product_added = (
+            f"""
+                ✅ Product Added Successfully!
+
+                Product ID : {product_id}
+
+                Product Name : {product_name}
+
+                Category : {category}
+                """
+                        )
+
             st.cache_data.clear()
+
             st.rerun()
+                
+
+            
 
 
 
@@ -930,7 +945,7 @@ def show_manage_products():
                 )
 
                 add_audit_log(
-                    "UPDATE_PRODUCT",
+                    "✏️ UPDATE_PRODUCT",
                     description
                 )
 
@@ -941,11 +956,17 @@ def show_manage_products():
                 st.rerun()
         
 def show_restock():
-
+  
     st.title(
         "📦 Restock Inventory"
     )
 
+    if "restock_success" in st.session_state:
+
+        st.success(st.session_state.restock_success)
+
+        del st.session_state.restock_success
+    
     inventory = get_inventory()
     
     inventory_df = pd.DataFrame(
@@ -975,20 +996,37 @@ def show_restock():
         )
         
     left, center, right = st.columns([2,1,2])
-    with center:
-        if st.button("Update Inventory"):
 
-            restock_inventory(
-                selected_product,
-                restock_quantity
-            )
-            add_audit_log("RESTOCK_PRODUCT",f"Restocked '{selected_product}' by {restock_quantity} units.")
-            st.cache_data.clear()
-        
-            
-            st.success(
-                f"{selected_product} restocked successfully!"
-            )
+    restock_clicked = False
+
+    with center:
+        restock_clicked = st.button("Update Inventory")
+
+    if restock_clicked:
+
+        restock_inventory(
+            selected_product,
+            restock_quantity
+        )
+
+        add_audit_log(
+            "📦 RESTOCK_PRODUCT",
+            f"""
+    Product : {selected_product}
+
+    Stock Increased by {restock_quantity} units.
+    """
+        )
+
+    st.session_state.restock_success = f"""
+✅ Inventory Updated Successfully
+
+Product : {selected_product}
+
+Quantity Added : {restock_quantity}
+"""
+
+st.cache_data.clear()
 
 def show_reports():
 
